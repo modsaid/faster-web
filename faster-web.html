@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]> <html class="no-js ie6" lang="en"> <![endif]-->
+<!--[if IE 7]>    <html class="no-js ie7" lang="en"> <![endif]-->
+<!--[if IE 8]>    <html class="no-js ie8" lang="en"> <![endif]-->
+<!--[if gt IE 8]><!-->  <html class="no-js" lang="en"> <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  
+  <title>Faster Websites</title>
+  
+  <meta name="description" content="Optimizing web applications for more responsiveness">
+  <meta name="author" content="Mahmoud Said (aka  modsaid)">
+  <meta name="viewport" content="width=1024, user-scalable=no">
+  
+  <!-- Core and extension CSS files -->
+  <link rel="stylesheet" href="deck.js/core/deck.core.css">
+  <link rel="stylesheet" href="deck.js/extensions/goto/deck.goto.css">
+  <link rel="stylesheet" href="deck.js/extensions/menu/deck.menu.css">
+  <link rel="stylesheet" href="deck.js/extensions/navigation/deck.navigation.css">
+  <link rel="stylesheet" href="deck.js/extensions/status/deck.status.css">
+  <link rel="stylesheet" href="deck.js/extensions/hash/deck.hash.css">
+  <link rel="stylesheet" href="deck.js/extensions/scale/deck.scale.css">
+  <link rel="stylesheet" href="faster-web.css">
+  
+  <!-- Style theme. More available in /themes/style/ or create your own. -->
+  <link rel="stylesheet" href="deck.js/themes/style/web-2.0.css">
+  
+  <!-- Transition theme. More available in /themes/transition/ or create your own. -->
+  <link rel="stylesheet" href="deck.js/themes/transition/horizontal-slide.css">
+  
+  <script src="deck.js/modernizr.custom.js"></script>
+  <link href="prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="prettify.js"></script>
+</head>
+
+<body class="deck-container">
+
+<!-- Begin slides -->
+<section class="slide" id="title-slide">
+  <h1>Faster Websites</h1>
+</section>
+
+<section class="slide" id="performance-concepts">
+  <h2>Performance Concepts</h2>
+  <ul>
+    <li class="slide" id="premature-optimization"><i>"Premature Optimization is the root of all evil" </i> <br/>Donald Knuth</li>
+    <li class="slide" id="concepts-tradeoff"> Tradeoffs 
+      <ul>
+        <li>I want to go to heaven, but I don’t want to die.</li>
+        <li>Project Triangle: Fast. Good. Cheap. Pick Two.</li>
+      </ul>
+    </li>
+    <li class="slide" id="concepts-module"> Tune the significat parts first <br/> 
+      <table style="width:700px; border: solid 1px">
+        <tr><th>Module</th><td>A</td><td>B</td><td>C</td><td>D</td></tr>
+        <tr><th>Cost</th><td>60%</td><td>4%</td><td>24%</td><td>12%</td></tr>
+      </table> 
+    </li>
+  </ul>
+</section>
+
+<section class="slide" id="responsiveness">
+  <h2>Responsiveness</h2>
+  <ul>
+    <li class="slide" id="responsiveness-direct"><b>0.1 sec:</b> Direct manipulation of objects <span><img class="inline" src="images/happy-tears.jpg" /></span></li>
+    <li class="slide" id="responsiveness-working"><b>1 sec:</b> The machine is working <img class="inline" src="images/bored.jpg" /></li>
+    <li class="slide" id="responsiveness-max-attention"><b>10 sec:</b> Limit for keeping attention <img class="inline" src="images/annoyed.png" /></li>
+    <li class="slide" id="responsiveness-3aboko"><b>more than 10 sec:</b>  <img class="inline" src="images/3aboko.jpg" /></li>    
+  </ul>  
+</section>
+
+<section class="slide" id="axe-of-error">
+  <h2>The Axes of Error</h2>
+  <p><img src="images/axe-of-failure.png"/></p>
+</section>
+
+<section class="slide" id="request-life-cycle">
+  <h2>Request life cycle</h2>
+  <p>
+    <img src="images/request-lifecycle.png" />
+  </p>
+</section>
+
+<section class="slide" id="akhbarak-case-initial-request">
+  <h2>Test Case: Akhbarak.net</h2>
+  <p>
+    <a href="http://www.webpagetest.org/result/120531_9F_8BY/1/details/" target="_blank"><img src="images/akhbarak-init-waterfall.png"></a>
+  </p>
+</section>
+
+<section class="slide" id="max-connections-per-domain">
+  <h2>Max concurrent downloads per domain</h2>
+  <p>
+    Browsers have a limit on the number of connections they open to a single hostname.
+    <img src="images/browsers-conn.png">
+  </p>
+</section>
+
+<section class="slide" id="max-connections-per-domain2">
+  <h2>Max concurrent downloads per domain</h2>
+  <ul>
+    <li> http://static.akhbarak.net</li>
+    <li> http://assets1.akhbarak.net</li>
+    <li> http://assets2.akhbarak.net</li>
+    <li> http://assets3.akhbarak.net</li>
+  </ul>
+</section>
+
+<section class="slide" id="caching-headers">
+  <h2>Use caching headers</h2>
+  <p> Static resources rarely changes. cache them
+    <pre><code class="prettyprint">
+    <%= image_tag("asa7be.png") %> 
+              => '/images/asa7be.png?1338397202' 
+    <%= javascript_include_tag "plugins" %> 
+              => '/javascripts/plugins.js?1335678209'
+    <%= stylesheet_link_tag "style" %>  
+              => '/stylesheets/style.css?1554367479'</code></pre>
+  </p>
+</section>
+
+<section class="slide" id="caching-headers2">
+  <h2>Use caching headers</h2>
+    <p> configure expire headers in nginx
+      <pre><code class="prettyprint">
+        location ~* (stylesheets|javascripts|images) {
+                if (!-f $request_filename) {
+                        break;
+                }
+                if ($query_string ~* "^[0-9]{10}$") {
+                        expires max;
+                }
+        }</code></pre>
+    </p>
+</section>
+
+<section class="slide" id="javascript">
+  <h1>Javascript</h1>
+</section>
+
+<section class="slide" id="javascript-split-payload">
+  <h2>Splitting the payload</h2>
+  <ul>
+    <li>Include <strong>ONLY</strong> what is necessary for rendering, postpone everything else till later</li>
+    <li>Load the rest of the javascript in asynchronous manner</li>
+    <li>Lazy initialize</li>
+    <li>Avoid evaluating unnecessary scripts</li>
+    <li>Avoid evaluating duplicate scripts</li>
+    <li>Efficient JS</li>
+  </ul>
+</section>
+
+
+<section class="slide" id="javascript-async">
+  <h2>Load javascript asyncronously</h2>
+  <ul>
+    <li>XHR Eval</li>
+    <li>XHR Injection</li>
+    <li>Script in Iframe</li>
+    <li>Script DOM Element</li>
+    <li>Script Defer</li>
+    <li>document.write Script Tag</li>
+  </ul>
+</section>
+
+<section class="slide" id="javascript-async-xhr">
+  <h2>XHR Eval</h2>
+      <pre><code class="prettyprint">xhrObj = new XMLHttpRequest();
+xhrObj.onreadystatechange =
+  function() {
+    if ( xhrObj.readyState == 4 && 200 == xhrObj.status ) {
+      eval(xhrObj.responseText);
+    }
+  };
+xhrObj.open('GET', 'A.js', true); // must be same domain
+xhrObj.send('');</code></pre>  
+</section>
+
+<section class="slide" id="javascript-async-script-dom">
+  <h2>script DOM Element</h2>
+      <pre><code class="prettyprint">var scriptElem = document.createElement('script');
+scriptElem.src = 'http://anydomain.com/A.js';
+document.getElementsByTagName('head')[0].appendChild(scriptElem);</code></pre>  
+</section>
+
+<section class="slide" id="javascript-async-defer">
+  <h2>script Defer (IE)</h2>
+  <p>Internet Explorer supports the SCRIPT DEFER attribute </p>
+  <pre><code class="prettyprint">< script defer src="A.js" >< /script ></code></pre>  
+</section>
+
+<section class="slide" id="javascript-lazy-initialize">
+  <h2>Lazily initialize exessive event handlers</h2>
+  <ul>
+    <li>Example: 37signals <a href="http://37signals.com/svn/posts/3137-using-event-capturing-to-improve-basecamp-page-load-times" target="_blank">Using event capturing to improve Basecamp page load times</a></li>
+    <li>lots of todo lists and todo list items that needs to be sortable and draggable</li>
+  </ul>
+  <pre><code class="prettyprint">$.ready(function() {
+  $("article.todolist, section.todolists").sortable();
+});</code></pre>
+</section>
+
+<section class="slide" id="javascript-lazy-initialize2">
+  <h2>Lazily initialize exessive event handlers (2)</h2>
+  <ul>
+    <li>Differ initialization until clear intention of usage</li>
+    <li>Differ initialization until the first mousedown event</li>
+  </ul>
+  <div class="slide" id='lazy-init-code'>
+    <pre><code class="prettyprint">$(document).on("mousedown", ".sortable_handle", function() {
+  $("article.todolist, section.todolists").sortable();
+});</code></pre>
+  </div>
+  <div class="slide" id='basecamp-gain'>
+    <img src="images/basecamp-improvement.png" width="600">
+  </div>
+</section>
+
+
+<section class="slide" id="css">
+  <h1>CSS</h1>
+</section>
+
+<section class="slide" id="css-points">
+  <h2>CSS</h2>
+  <ul>
+    <li>Avoiding inefficient key selectors that match large numbers of elements can speed up page rendering.</li>
+    <li>Selectors are evaluated from right to left.</li>
+    <li>It is mainly about matching.</li>
+    <li>Remove unused rules/selectors</li>
+  </ul>
+</section>
+
+<section class="slide" id="css-selectors-type">
+  <h2>Types of Selectors</h2>
+  <p>ID's are the most efficient, Universal are the least</p>
+  <pre><code class="prettyprint">#main-navigation {   }      /* ID (Fastest) */
+body.home #page-wrap {   }  /* ID */
+.main-navigation {   }      /* Class */
+ul li a.current {   }       /* Class *
+ul {   }                    /* Tag */
+ul li a {  }                /* Tag */
+* {   }                     /* Universal (Slowest) */
+#content [title='home']     /* Universal */</code></pre>  
+
+<pre><code class="prettyprint">#main-nav > li {   }    /* Slower than it might seem */
+html body ul li a {  }    /* freaking disaster!!! */</code></pre>  
+</section>
+
+<section class="slide" id="css-dont-import">
+  <h2>Avoid using @import</h2>
+  <div>
+    <pre><code class="prettyprint">< style >
+@import url('a.css');
+@import url('b.css');
+< /style ></code></pre>  
+  <IMG SRC="images/import-ok.gif">
+  </div>
+  <div class="slide" id="link-import">
+    <pre><code class="prettyprint">< link rel='stylesheet' type='text/css' href='a.css' >
+< style > @import url('b.css');  < /style ></code></pre>  
+  <IMG SRC="images/import-link.gif">
+  </div>
+
+
+</section>
+
+
+
+
+
+
+
+
+
+
+<section class="slide" id="tools">
+  <h2>Tools</h2>
+  <ul>
+    <li><a href="http://www.webpagetest.org/" target="_blank">http://www.webpagetest.org/</a></li>
+    <li><a href="http://unused-css.com/detect-unused-css" target="_blank">http://unused-css.com/detect-unused-css</a></li>
+   <li><a href="https://addons.mozilla.org/en-US/firefox/addon/dust-me-selectors/" target="_blank">Dust me Selectors (Firefox extension)</a></li>
+   <li><a href="https://addons.mozilla.org/en-US/firefox/addon/yslow/?src=search" target="_blank">YSlow (Firefox extension)</a></li>
+ </ul>
+</section>
+
+
+
+
+
+<section class="slide" id="references">
+  <h2>References</h2>
+  <ul>
+    <li><a href="http://my.safaribooksonline.com/book/web-design-and-development/9780596803773" target="_blank">Even Faster Websites</a></li>
+    <li><a href="http://developer.yahoo.com/performance/rules.html#dns_lookups" target="_blank">http://developer.yahoo.com/performance/rules.html#dns_lookups</a></li>
+    <li><a href="http://www.agileweboperations.com/lifecycle-of-a-click-improving-web-page-speed" target="_blank">http://www.agileweboperations.com/lifecycle-of-a-click-improving-web-page-speed</a></li>
+   <li><a href="https://developers.google.com/speed/docs/best-practices/rendering#UseEfficientCSSSelectors" target="_blank">https://developers.google.com/speed/docs/best-practices/rendering#UseEfficientCSSSelectors</a></li>
+    <li><a href="https://developer.mozilla.org/en/Writing_Efficient_CSS#ID_rules" target="_blank">https://developer.mozilla.org/en/Writing_Efficient_CSS#ID_rules</a></li>
+    <li><a href="http://css-tricks.com/efficiently-rendering-css/" target="_blank">http://css-tricks.com/efficiently-rendering-css/</a></li>
+   <li><a href="http://37signals.com/svn/posts/3137-using-event-capturing-to-improve-basecamp-page-load-times" target="_blank">http://37signals.com/svn/posts/3137-using-event-capturing-to-improve-basecamp-page-load-times</a></li>
+    <li><a href="http://taligarsiel.com/Projects/howbrowserswork1.htm#CSS_parsing " target="_blank">http://taligarsiel.com/Projects/howbrowserswork1.htm#CSS_parsing </a></li>
+  </ul>
+</section>
+
+<section class="slide" id="thankyou">
+  <h1>Thank You</h1>
+</section>
+
+
+<!-- deck.navigation snippet -->
+<a href="#" class="deck-prev-link" title="Previous">&#8592;</a>
+<a href="#" class="deck-next-link" title="Next">&#8594;</a>
+
+<!-- deck.status snippet -->
+<p class="deck-status">
+  <span class="deck-status-current"></span>
+  /
+  <span class="deck-status-total"></span>
+</p>
+
+<!-- deck.goto snippet -->
+<form action="." method="get" class="goto-form">
+  <label for="goto-slide">Go to slide:</label>
+  <input type="text" name="slidenum" id="goto-slide" list="goto-datalist">
+  <datalist id="goto-datalist"></datalist>
+  <input type="submit" value="Go">
+</form>
+
+<!-- deck.hash snippet -->
+<a href="." title="Permalink to this slide" class="deck-permalink">#</a>
+
+
+<!-- Grab CDN jQuery, with a protocol relative URL; fall back to local if offline -->
+<script src="//ajax.aspnetcdn.com/ajax/jQuery/jquery-1.7.min.js"></script>
+<script>window.jQuery || document.write('<script src="deck.js/jquery-1.7.min.js"><\/script>')</script>
+
+<!-- Deck Core and extensions -->
+<script src="deck.js/core/deck.core.js"></script>
+<script src="deck.js/extensions/hash/deck.hash.js"></script>
+<script src="deck.js/extensions/menu/deck.menu.js"></script>
+<script src="deck.js/extensions/goto/deck.goto.js"></script>
+<script src="deck.js/extensions/status/deck.status.js"></script>
+<script src="deck.js/extensions/navigation/deck.navigation.js"></script>
+<script src="deck.js/extensions/scale/deck.scale.js"></script>
+
+<!-- Initialize the deck -->
+<script>
+$(function() {
+  $.deck('.slide');
+  prettyPrint();
+});
+</script>
+
+</body>
+</html>
