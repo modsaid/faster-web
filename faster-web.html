@@ -41,6 +41,19 @@
   <h1>Faster Websites</h1>
 </section>
 
+<section class="slide" id="outline">
+  <h2>Outline</h2>
+  <ul>
+    <li>Performance concepts</li>
+    <li>Responsiveness</li>
+    <li>Request lifecycle</li>
+    <li>Network Optimization</li>
+    <li>Javascript</li>
+    <li>CSS</li>
+    <li>Tools & References</li>
+  </ul>
+</section>
+
 <section class="slide" id="performance-concepts">
   <h2>Performance Concepts</h2>
   <ul>
@@ -188,6 +201,18 @@ document.getElementsByTagName('head')[0].appendChild(scriptElem);</code></pre>
   <h2>script Defer (IE)</h2>
   <p>Internet Explorer supports the SCRIPT DEFER attribute </p>
   <pre><code class="prettyprint">< script defer src="A.js" >< /script ></code></pre>  
+</section>
+
+<section class="slide" id="fb-sdk">
+  <h2>Facebook Async SDK</h2>
+<pre><code class="prettyprint">< div id="fb-root" >< /div >
+< script >(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) return;
+  js = d.createElement(s); js.id = id;
+  js.src = "//connect.facebook.net/en_US/all.js#xfbml=1&appId=102269883223064";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));< /script ></code></pre> 
 </section>
 
 <section class="slide" id="javascript-lazy-initialize">
